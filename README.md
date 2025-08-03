@@ -43,23 +43,6 @@ const signature = agent.signObject(message);
 console.log('Message created and signed!');
 ```
 
-## 📁 Repository Structure
-
-```
-snap-protocol-core/
-├── specification/           # Protocol specification documents
-│   ├── core/               # Core protocol features
-│   └── extensions/         # Optional extensions
-├── reference/              # Reference implementations
-│   ├── typescript/         # TypeScript/JavaScript
-│   └── python/            # Python (planned)
-├── examples/              # Usage examples
-│   ├── basic-agent/       # Simple agent communication
-│   ├── multi-modal/       # Rich content examples
-│   └── payment-flow/      # Payment integration
-└── schemas/              # JSON Schema definitions
-```
-
 ## 🛠️ Reference Implementations
 
 ### TypeScript/JavaScript
