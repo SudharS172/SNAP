@@ -70,7 +70,6 @@ Full-featured implementation with:
 - Ed25519 cryptography via tweetnacl
 - Browser and Node.js support
 
-[→ TypeScript Documentation](./reference/typescript/README.md)
 
 ### Python *(Coming Soon)*
 
@@ -79,12 +78,6 @@ Python implementation with:
 - Cryptography library integration
 - AsyncIO support for streaming
 
-## 📖 Protocol Specification
-
-The SNAP protocol is defined in human-readable markdown documents:
-
-- **[Core Protocol](./specification/core/)** - Message format, identity, transport
-- **[Extensions](./specification/extensions/)** - Tasks, streaming, payments
 
 ## 🎮 Try It Now
 
@@ -161,10 +154,6 @@ npm test
 npm run dev
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
 ### Development Workflow
 
 1. Fork the repository
@@ -188,16 +177,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - [ ] Plugin system for extensions
 
 
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## 🙏 Acknowledgments
-
 SNAP Protocol is inspired by:
 - **JSON-RPC 2.0** for transport standardization
-- **ActivityPub** for decentralized communication patterns  
-- **OpenAI API** for AI-first design principles
 - **WebRTC** for peer-to-peer communication concepts
 
 ---
