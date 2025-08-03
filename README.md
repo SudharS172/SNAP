@@ -79,11 +79,6 @@ Python implementation with:
 - AsyncIO support for streaming
 
 
-## 🎮 Try It Now
-
-
-Build messages, simulate tasks, and export code examples in your browser.
-
 ## 💡 Examples
 
 ### Multi-Modal Message
