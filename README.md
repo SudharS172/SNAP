@@ -88,9 +88,6 @@ The SNAP protocol is defined in human-readable markdown documents:
 
 ## 🎮 Try It Now
 
-Want to experiment with SNAP? Try our interactive playground:
-
-**[→ SNAP Protocol Playground](https://github.com/snap-protocol/playground)**
 
 Build messages, simulate tasks, and export code examples in your browser.
 
@@ -190,12 +187,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - [ ] Advanced streaming features
 - [ ] Plugin system for extensions
 
-## 🆘 Support
-
-- **Documentation**: [https://docs.snapprotocol.org](https://docs.snapprotocol.org)
-- **Issues**: [GitHub Issues](https://github.com/snap-protocol/core/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/snap-protocol/core/discussions)
-- **Community**: [Discord](https://discord.gg/snapprotocol)
 
 ## 📄 License
 
