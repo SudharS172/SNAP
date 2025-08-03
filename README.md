@@ -20,7 +20,7 @@ SNAP enables AI agents to communicate with rich, multi-modal messages while main
 ### Installation
 
 ```bash
-npm install @snap-protocol/core
+npm install semnet-snap-protocol
 ```
 
 ### Basic Usage
@@ -116,7 +116,6 @@ const paymentMessage = MessageUtils.paymentRequest(
 
 ```bash
 # Clone the repository
-git clone https://github.com/snap-protocol/core
 
 # Install dependencies
 cd reference/typescript
