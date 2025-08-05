@@ -1,6 +1,6 @@
 {
-  "name": "@semnet/snap-protocol",
-  "version": "1.1.0",
+  "name": "semnet-snap-protocol",
+  "version": "1.1.1",
   "description": "TypeScript reference implementation of the SNAP Protocol v1.1 - Agent Internet Edition",
   "type": "module",
   "main": "dist/index.js",
