@@ -1,6 +1,19 @@
 import { z } from 'zod';
 
 // ==========================================
+// User Identity
+// ==========================================
+
+export const UserIDSchema = z.object({
+  id: z.string().regex(/^snap:user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
+  publicKey: z.string(),
+  name: z.string().optional(),
+  metadata: z.record(z.any()).optional()
+});
+
+export type UserID = z.infer<typeof UserIDSchema>;
+
+// ==========================================
 // Agent Identity
 // ==========================================
 
@@ -136,8 +149,8 @@ export type Part = z.infer<typeof PartSchema>;
 export const PaymentSchema = z.object({
   amount: z.number().positive(),
   currency: z.literal('SEMNET'),
-  from: AgentIDSchema,
-  to: AgentIDSchema,
+  from: z.union([AgentIDSchema, UserIDSchema]),
+  to: z.union([AgentIDSchema, UserIDSchema]),
   reference: z.string().optional(),
   memo: z.string().optional(),
   status: z.enum(['pending', 'authorized', 'executed', 'failed']).optional()
@@ -151,9 +164,9 @@ export type Payment = z.infer<typeof PaymentSchema>;
 
 export const SNAPMessageSchema = z.object({
   id: z.string(),
-  version: z.literal('1.0'),
-  from: AgentIDSchema,
-  to: AgentIDSchema.optional(),
+  version: z.enum(['1.0', '1.1']).default('1.1'),
+  from: z.union([AgentIDSchema, UserIDSchema]),
+  to: z.union([AgentIDSchema, UserIDSchema]).optional(),
   timestamp: z.string().datetime(),
   parts: z.array(PartSchema).min(1),
   context: z.string().optional(),
@@ -225,6 +238,31 @@ export enum SNAPErrorCode {
 }
 
 // ==========================================
+// Account Linking (Optional)
+// ==========================================
+
+export const AccountLinkRequestSchema = z.object({
+  userId: z.string().regex(/^snap:user:[0-9a-f-]{36}$/),
+  agentId: z.string().regex(/^snap:agent:[0-9a-f-]{36}$/),
+  serviceName: z.string(),
+  linkingUrl: z.string().url(),
+  expiresAt: z.string().datetime().optional()
+});
+
+export type AccountLinkRequest = z.infer<typeof AccountLinkRequestSchema>;
+
+export const AccountLinkStatusSchema = z.object({
+  userId: z.string(),
+  agentId: z.string(),
+  serviceName: z.string(),
+  status: z.enum(['pending', 'linked', 'expired', 'revoked']),
+  linkedAt: z.string().datetime().optional(),
+  expiresAt: z.string().datetime().optional()
+});
+
+export type AccountLinkStatus = z.infer<typeof AccountLinkStatusSchema>;
+
+// ==========================================
 // Agent Discovery
 // ==========================================
 
@@ -255,19 +293,33 @@ export const AgentCapabilitiesSchema = z.object({
 
 export type AgentCapabilities = z.infer<typeof AgentCapabilitiesSchema>;
 
+// Rate limiting schema (optional)
+export const RateLimitSchema = z.object({
+  requests: z.number().positive(),
+  window: z.number().positive(), // window in seconds
+  costLimit: z.number().positive().optional(), // max SEMNET credits per window
+  strategy: z.enum(['fixed-window', 'sliding-window']).default('fixed-window')
+});
+
+export type RateLimit = z.infer<typeof RateLimitSchema>;
+
 export const AgentCardSchema = z.object({
   identity: AgentIDSchema,
   name: z.string(),
-  description: z.string(),
+  description: z.string(), // Optimized for vector search - comprehensive description
+  keywords: z.array(z.string()), // For vector search optimization
+  capabilities: z.array(z.string()), // Simple capability list like ["email.send", "email.read"]
   version: z.string(),
   endpoint: z.string().url(),
-  skills: z.array(AgentSkillSchema),
-  capabilities: AgentCapabilitiesSchema.optional(),
+  skills: z.array(AgentSkillSchema).optional(), // Made optional for simpler agents
+  technicalCapabilities: AgentCapabilitiesSchema.optional(), // Renamed for clarity
   pricing: z.object({
     model: z.enum(['free', 'per-request', 'per-minute', 'subscription']),
     cost: z.number().optional(),
     currency: z.literal('SEMNET').optional()
   }).optional(),
+  rateLimit: RateLimitSchema.optional(), // Optional rate limiting
+  requiresAccountLink: z.boolean().default(false), // Does this agent need account linking?
   metadata: z.object({
     category: z.string().optional(),
     tags: z.array(z.string()).optional(),
@@ -337,18 +389,111 @@ export enum StreamEventType {
   STATUS = 'status', 
   PROGRESS = 'progress',
   ERROR = 'error',
-  COMPLETE = 'complete'
+  COMPLETE = 'complete',
+  CONVERSATION = 'conversation'
 }
 
-export const StreamEventSchema = z.object({
+// Base stream event schema
+export const BaseStreamEventSchema = z.object({
   id: z.string(),
-  type: z.nativeEnum(StreamEventType),
   timestamp: z.string().datetime(),
-  data: z.any(),
   metadata: z.record(z.any()).optional()
 });
 
+// Status stream event - shows what agent is doing
+export const StatusStreamEventSchema = BaseStreamEventSchema.extend({
+  type: z.literal('status'),
+  data: z.object({
+    streamId: z.string(),
+    status: z.enum(['active', 'paused', 'cancelled']),
+    currentAction: z.string(), // "Searching for flights..."
+    progress: z.number().min(0).max(1).optional() // 0.5 = 50% done
+  })
+});
+
+// Conversation stream event - shows agent-to-agent messages
+export const ConversationStreamEventSchema = BaseStreamEventSchema.extend({
+  type: z.literal('conversation'),
+  data: z.object({
+    streamId: z.string(),
+    direction: z.enum(['outgoing', 'incoming']), // from user's perspective
+    from: z.union([AgentIDSchema, UserIDSchema]),
+    to: z.union([AgentIDSchema, UserIDSchema]),
+    message: SNAPMessageSchema, // The actual SNAP message
+    latency: z.number().optional(), // Response time in ms
+    cost: z.number().optional() // Cost of this interaction
+  })
+});
+
+// Progress stream event
+export const ProgressStreamEventSchema = BaseStreamEventSchema.extend({
+  type: z.literal('progress'),
+  data: z.object({
+    streamId: z.string(),
+    progress: z.number().min(0).max(1),
+    message: z.string().optional()
+  })
+});
+
+// Error stream event
+export const ErrorStreamEventSchema = BaseStreamEventSchema.extend({
+  type: z.literal('error'),
+  data: z.object({
+    streamId: z.string(),
+    code: z.number(),
+    message: z.string(),
+    details: z.any().optional()
+  })
+});
+
+// Message stream event
+export const MessageStreamEventSchema = BaseStreamEventSchema.extend({
+  type: z.literal('message'),
+  data: SNAPMessageSchema
+});
+
+// Complete stream event
+export const CompleteStreamEventSchema = BaseStreamEventSchema.extend({
+  type: z.literal('complete'),
+  data: z.object({
+    streamId: z.string(),
+    result: z.any().optional(),
+    summary: z.string().optional()
+  })
+});
+
+// Union of all stream events
+export const StreamEventSchema = z.discriminatedUnion('type', [
+  StatusStreamEventSchema,
+  ConversationStreamEventSchema,
+  ProgressStreamEventSchema,
+  ErrorStreamEventSchema,
+  MessageStreamEventSchema,
+  CompleteStreamEventSchema
+]);
+
 export type StreamEvent = z.infer<typeof StreamEventSchema>;
+export type StatusStreamEvent = z.infer<typeof StatusStreamEventSchema>;
+export type ConversationStreamEvent = z.infer<typeof ConversationStreamEventSchema>;
+
+// Stream subscription schema - for subscribing to conversation streams
+export const StreamSubscriptionSchema = z.object({
+  userId: z.string().regex(/^snap:user:[0-9a-f-]{36}$/), // User subscribing
+  streamTypes: z.array(z.enum([
+    'conversations', // Agent-to-agent messages
+    'status',        // What agent is doing
+    'progress',      // Progress updates
+    'errors'         // Problems that occur
+  ])),
+  filter: z.object({
+    agents: z.array(z.string()).optional(), // Only these agents
+    excludeAgents: z.array(z.string()).optional(), // Not these
+    minCost: z.number().optional(), // Only show interactions above this cost
+    maxCost: z.number().optional() // Only show interactions below this cost
+  }).optional()
+});
+
+export type StreamSubscription = z.infer<typeof StreamSubscriptionSchema>;
 
 // ==========================================
 // Extended JSON-RPC Methods
@@ -364,6 +509,11 @@ export const SNAPMethodSchema = z.enum([
   'agent/register',
   'agent/update',
   'agent/remove',
+  
+  // Account linking methods (optional)
+  'account/link',        // Request account linking
+  'account/status',      // Check link status
+  'account/revoke',      // Revoke account link
   
   // Task methods
   'task/create',
@@ -381,7 +531,12 @@ export const SNAPMethodSchema = z.enum([
   // Stream methods
   'stream/start',
   'stream/send',
-  'stream/end'
+  'stream/end',
+  'stream/subscribe',    // Subscribe to conversation streams
+  'stream/unsubscribe',  // Unsubscribe from streams
+  'stream/filter',       // Update stream filters
+  'stream/pause',        // Pause a stream
+  'stream/resume'        // Resume a stream
 ]);
 
 export type SNAPMethod = z.infer<typeof SNAPMethodSchema>;

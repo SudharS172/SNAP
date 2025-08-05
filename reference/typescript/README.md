@@ -1,230 +1,226 @@
-# SNAP Protocol - TypeScript Reference Implementation
+# @semnet/snap-protocol
 
-Official TypeScript implementation of the SNAP Protocol v1.0.
+TypeScript implementation of SNAP (Semantic Network Agent Protocol) v1.1 - The foundation for the Agent Internet.
+
+[![npm version](https://badge.fury.io/js/%40semnet%2Fsnap-protocol.svg)](https://www.npmjs.com/package/@semnet/snap-protocol)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
 
 ```bash
-npm install @snap-protocol/core
+npm install @semnet/snap-protocol
+```
+
+## What's New in v1.1 - Agent Internet Edition
+
+### 🆕 User Identity
+Users can now participate directly in the agent network:
+
+```typescript
+import { UserID } from '@semnet/snap-protocol';
+
+const user: UserID = {
+  id: "snap:user:alice-123",
+  publicKey: "ed25519:...",
+  name: "Alice"
+};
+```
+
+### 🎥 Conversation Streaming
+Watch agent-to-agent conversations in real-time:
+
+```typescript
+import { ConversationStreamEvent } from '@semnet/snap-protocol';
+
+// Subscribe to conversations
+const subscription = {
+  userId: "snap:user:alice-123",
+  streamTypes: ["conversations", "status"],
+  filter: {
+    agents: ["snap:agent:flight-booking"]
+  }
+};
+
+// Receive conversation events
+const event: ConversationStreamEvent = {
+  type: "conversation",
+  data: {
+    direction: "outgoing",
+    from: userAI,
+    to: flightAgent,
+    message: snapMessage,
+    latency: 150,
+    cost: 0.02
+  }
+};
+```
+
+### 🔗 Account Linking (Optional)
+Connect existing accounts to the agent network:
+
+```typescript
+import { AccountLinkRequest } from '@semnet/snap-protocol';
+
+const linkRequest: AccountLinkRequest = {
+  userId: "snap:user:alice-123",
+  agentId: "snap:agent:gmail",
+  serviceName: "google",
+  linkingUrl: "https://gmail.com/link-snap-agent"
+};
+```
+
+### 🔍 Vector Search Optimization
+Agent cards optimized for discovery:
+
+```typescript
+import { AgentCard } from '@semnet/snap-protocol';
+
+const agentCard: AgentCard = {
+  identity: agentId,
+  name: "Email Pro",
+  description: "Send emails, read emails, search emails, Gmail Outlook Yahoo",
+  keywords: ["email", "gmail", "outlook", "messaging"],
+  capabilities: ["email.send", "email.read", "email.search"],
+  endpoint: "https://email.agents.semnet.dev",
+  version: "2.0.0",
+  requiresAccountLink: true,
+  rateLimit: {
+    requests: 100,
+    window: 60
+  }
+};
 ```
 
 ## Quick Start
 
 ```typescript
-import { AgentIdentity, createMessage } from '@snap-protocol/core';
+import { 
+  AgentIdentity, 
+  createMessage,
+  SNAPMessage,
+  UserID,
+  AgentID
+} from '@semnet/snap-protocol';
 
-// Create an agent identity
+// Create agent identity
 const agent = AgentIdentity.generate();
 console.log(`Agent ID: ${agent.identity.id}`);
 
-// Build a message
-const message = createMessage(agent.exportPublic())
-  .text('Hello, world!')
-  .data({ timestamp: new Date().toISOString() })
+// Create a user
+const user: UserID = {
+  id: "snap:user:alice-123",
+  publicKey: "ed25519:...",
+  name: "Alice"
+};
+
+// Build a message from user to agent
+const message = createMessage(user)
+  .to(agent.exportPublic())
+  .text('Book me a flight to NYC tomorrow')
+  .build();
+
+// Agent responds with options
+const response = createMessage(agent.exportPublic())
+  .to(user)
+  .text('Found 3 flights to NYC tomorrow:')
+  .data({
+    flights: [
+      { airline: "Delta", time: "08:00", price: 250 },
+      { airline: "United", time: "10:30", price: 220 },
+      { airline: "JetBlue", time: "14:00", price: 195 }
+    ]
+  })
+  .payment({
+    amount: 0.05,
+    currency: "SEMNET",
+    from: user,
+    to: agent.exportPublic(),
+    status: "executed",
+    memo: "Flight search service"
+  })
   .build();
 
 // Sign the message
-const signature = agent.signObject(message);
-console.log(`Signature: ${signature}`);
+const signature = agent.signObject(response);
 ```
 
-## Features
+## Core Features
 
-- ✅ **Complete Type Safety** - Full TypeScript support with Zod validation
-- ✅ **Cryptographic Identity** - Ed25519 keypair generation and management
-- ✅ **Message Building** - Fluent API for creating multi-modal messages
-- ✅ **Digital Signatures** - Sign and verify messages
-- ✅ **Multi-Modal Content** - Text, data, files, images, audio, video
-- ✅ **Payment Support** - Built-in SEMNET payment integration
-- ✅ **Validation** - Schema validation for all message types
-
-## API Reference
-
-### Agent Identity
-
-```typescript
-import { AgentIdentity, generateAgentIdentity } from '@snap-protocol/core';
-
-// Generate a new identity
-const agent = AgentIdentity.generate();
-
-// Or create from existing private key
-const agent2 = AgentIdentity.fromPrivateKey(
-  { id: 'snap:agent:...', publicKey: '...' },
-  'base64-encoded-private-key'
-);
-
-// Sign messages
-const signature = agent.sign('message content');
-const signature2 = agent.signObject({ some: 'data' });
-```
-
-### Message Building
-
-```typescript
-import { createMessage, MessageUtils } from '@snap-protocol/core';
-
-const message = createMessage(agent.exportPublic())
-  .to(recipientAgent.exportPublic())
-  .context('conversation-context-id')
-  .text('Hello!', { format: 'plain', language: 'en' })
-  .data({ key: 'value' }, { schema: jsonSchema })
-  .file({
-    name: 'document.pdf',
-    mimeType: 'application/pdf',
-    uri: 'https://example.com/doc.pdf'
-  })
-  .image({
-    uri: 'https://example.com/image.jpg',
-    mimeType: 'image/jpeg',
-    alt: 'Description'
-  })
-  .payment({
-    amount: 10,
-    currency: 'SEMNET',
-    from: payer,
-    to: payee,
-    memo: 'Service payment'
-  })
-  .metadata({ custom: 'data' })
-  .build();
-```
-
-### Message Utilities
-
-```typescript
-import { MessageUtils } from '@snap-protocol/core';
-
-// Extract content
-const textParts = MessageUtils.extractText(message);
-const dataParts = MessageUtils.extractData(message);
-const files = MessageUtils.extractFiles(message);
-const images = MessageUtils.extractImages(message);
-
-// Check message properties
-const hasPayment = MessageUtils.hasPayment(message);
-const paymentAmount = MessageUtils.getPaymentAmount(message);
-const hasContext = MessageUtils.hasContext(message);
-
-// Validate messages
-const validMessage = MessageUtils.validate(messageObject);
-
-// Create replies
-const reply = MessageUtils.reply(originalMessage, myAgent.exportPublic())
-  .text('Thanks for your message!')
-  .build();
-
-// Create payment requests
-const paymentRequest = MessageUtils.paymentRequest(
-  seller, buyer, 100, 'Service description'
-);
-```
-
-### Cryptography
-
-```typescript
-import { 
-  signMessage, 
-  verifySignature, 
-  hashContent,
-  generateMessageId,
-  generateContextId 
-} from '@snap-protocol/core';
-
-// Sign and verify
-const signature = signMessage('content', privateKey);
-const isValid = verifySignature('content', signature, publicKey);
-
-// Hashing
-const hash = await hashContent('data to hash');
-
-// ID generation
-const messageId = generateMessageId(); // msg_...
-const contextId = generateContextId(); // ctx_...
-```
+- ✅ **User & Agent Identity** - Both humans and AI agents in one network
+- ✅ **Conversation Streaming** - Real-time visibility into agent communications
+- ✅ **Multi-Modal Messages** - Text, data, files, images, audio, video
+- ✅ **Built-in Payments** - SEMNET token integration
+- ✅ **Account Linking** - Connect existing services (optional)
+- ✅ **Rate Limiting** - Prevent abuse (optional)
+- ✅ **Vector Search Ready** - Optimized agent discovery
+- ✅ **Full TypeScript** - Complete type safety with Zod validation
 
 ## Message Types
 
-### Text Message
+### User to Agent
 ```typescript
-const message = createMessage(sender)
-  .text('Hello, world!', {
-    format: 'markdown',
-    language: 'en'
-  })
-  .build();
+const message: SNAPMessage = {
+  id: "msg_123",
+  version: "1.1",
+  from: { id: "snap:user:alice", publicKey: "..." },
+  to: { id: "snap:agent:assistant" },
+  timestamp: new Date().toISOString(),
+  parts: [
+    { type: "text", content: "Help me plan a trip" }
+  ]
+};
 ```
 
-### Data Message
+### Agent to Agent
 ```typescript
-const message = createMessage(sender)
-  .data({
-    action: 'process',
-    parameters: { key: 'value' }
-  }, {
-    schema: jsonSchema
-  })
-  .build();
-```
-
-### File Message
-```typescript
-const message = createMessage(sender)
-  .file({
-    name: 'document.pdf',
-    mimeType: 'application/pdf',
-    uri: 'https://example.com/doc.pdf',
-    size: 1024000,
-    hash: 'sha256:...'
-  }, {
-    description: 'Important document'
-  })
-  .build();
-```
-
-### Multi-Modal Message
-```typescript
-const message = createMessage(sender)
-  .text('Check out this image:')
-  .image({
-    uri: 'https://example.com/photo.jpg',
-    mimeType: 'image/jpeg',
-    alt: 'Beautiful sunset'
-  }, {
-    caption: 'Taken yesterday evening'
-  })
-  .data({
-    location: { lat: 40.7128, lng: -74.0060 },
-    timestamp: '2025-01-01T18:30:00Z'
-  })
-  .build();
-```
-
-## Error Handling
-
-```typescript
-import { SNAPErrorCode } from '@snap-protocol/core';
-
-try {
-  const message = MessageUtils.validate(untrustedMessage);
-  // Process valid message
-} catch (error) {
-  if (error.code === SNAPErrorCode.INVALID_SIGNATURE) {
-    console.log('Invalid signature');
-  } else if (error.code === SNAPErrorCode.PAYMENT_REQUIRED) {
-    console.log('Payment required');
+const message: SNAPMessage = {
+  id: "msg_456",
+  version: "1.1",
+  from: { id: "snap:agent:user-ai" },
+  to: { id: "snap:agent:flight-booking" },
+  timestamp: new Date().toISOString(),
+  parts: [
+    { type: "text", content: "Search flights NYC tomorrow" }
+  ],
+  payment: {
+    amount: 0.1,
+    currency: "SEMNET",
+    from: userAI,
+    to: flightAgent,
+    status: "pending"
   }
-  // Handle other errors
+};
+```
+
+## Streaming Events
+
+Monitor agent activity in real-time:
+
+```typescript
+// Status updates
+{
+  type: "status",
+  data: {
+    streamId: "stream_123",
+    status: "active",
+    currentAction: "Searching for flights...",
+    progress: 0.5
+  }
+}
+
+// Conversation monitoring
+{
+  type: "conversation",
+  data: {
+    direction: "outgoing",
+    from: userAI,
+    to: weatherAgent,
+    message: snapMessage,
+    latency: 120,
+    cost: 0.01
+  }
 }
 ```
-
-## Examples
-
-See the [examples directory](../../examples/) for complete working examples:
-
-- [Basic Agent](../../examples/basic-agent/) - Simple agent communication
-- [Payment Flow](../../examples/payment-flow/) - Payment processing
-- [Multi-Modal](../../examples/multi-modal/) - Rich content handling
 
 ## Development
 
@@ -242,6 +238,19 @@ npm run test
 npm run dev
 ```
 
+## Documentation
+
+Full documentation at [https://protocol.semnet.dev](https://protocol.semnet.dev)
+
+## Examples
+
+See the [examples directory](../../examples/) for:
+- Basic agent communication
+- User-to-agent interactions
+- Conversation streaming
+- Account linking flows
+- Payment processing
+
 ## License
 
-MIT - see [LICENSE](../../LICENSE) for details.
+MIT License - Part of the SEMNET Agent Internet Project

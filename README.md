@@ -1,6 +1,9 @@
-# SNAP Protocol - Core Implementation
+# SNAP Protocol v1.1 - Agent Internet Edition
 
 The **Semantic Network Agent Protocol (SNAP)** is an open-source communication standard for AI agents. This repository contains the core protocol specification and reference implementations.
+
+[![npm version](https://badge.fury.io/js/%40semnet%2Fsnap-protocol.svg)](https://www.npmjs.com/package/@semnet/snap-protocol)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🎯 What is SNAP?
 
@@ -8,10 +11,13 @@ SNAP enables AI agents to communicate with rich, multi-modal messages while main
 
 ### Key Features
 
-- **🔐 Cryptographic Identity** - Ed25519 keypairs for agent authentication
+- **👤 User & Agent Identity** - Both humans and AI agents in one network
+- **🎥 Conversation Streaming** - Real-time visibility into agent communications
+- **🔐 Cryptographic Identity** - Ed25519 keypairs for authentication
 - **📝 Multi-Modal Messages** - Text, data, files, images, audio, video
 - **⏱️ Asynchronous Tasks** - Long-running operations with progress tracking  
 - **💰 Native Payments** - Built-in SEMNET token transactions
+- **🔗 Account Linking** - Connect existing services (optional)
 - **🌐 JSON-RPC Transport** - Standard request/response and streaming
 - **✅ Schema Validation** - Zod-based message validation
 
@@ -20,44 +26,96 @@ SNAP enables AI agents to communicate with rich, multi-modal messages while main
 ### Installation
 
 ```bash
-npm install @snap-protocol/core
+npm install @semnet/snap-protocol
 ```
 
 ### Basic Usage
 
 ```typescript
-import { AgentIdentity, createMessage } from '@snap-protocol/core';
+import { AgentIdentity, createMessage, UserID } from '@semnet/snap-protocol';
 
 // Generate agent identity
 const agent = AgentIdentity.generate();
 console.log(`Agent ID: ${agent.identity.id}`);
 
-// Create a message
-const message = createMessage(agent.exportPublic())
-  .text('Hello, SNAP Protocol!')
-  .data({ timestamp: new Date().toISOString() })
+// Create a user
+const user: UserID = {
+  id: "snap:user:alice-123",
+  publicKey: "ed25519:...",
+  name: "Alice"
+};
+
+// User sends message to agent
+const message = createMessage(user)
+  .to(agent.exportPublic())
+  .text('Hello, AI assistant!')
+  .build();
+
+// Agent responds
+const response = createMessage(agent.exportPublic())
+  .to(user)
+  .text('Hello Alice! How can I help you today?')
   .build();
 
 // Sign the message
-const signature = agent.signObject(message);
-console.log('Message created and signed!');
+const signature = agent.signObject(response);
 ```
 
 ## 📁 Repository Structure
 
 ```
-snap-protocol-core/
+SNAP/
 ├── specification/           # Protocol specification documents
 │   ├── core/               # Core protocol features
 │   └── extensions/         # Optional extensions
 ├── reference/              # Reference implementations
-│   ├── typescript/         # TypeScript/JavaScript
-│   └── python/            # Python (planned)
+│   ├── typescript/         # TypeScript/JavaScript (@semnet/snap-protocol)
+│   └── python/            # Python (coming soon)
 ├── examples/              # Usage examples
 │   ├── basic-agent/       # Simple agent communication
 │   ├── multi-modal/       # Rich content examples
 │   └── payment-flow/      # Payment integration
+├── CHANGELOG.md           # Version history
 └── schemas/              # JSON Schema definitions
+```
+
+## 🆕 What's New in v1.1
+
+### User Identity System
+```typescript
+const user: UserID = {
+  id: "snap:user:alice-123",
+  publicKey: "ed25519:...",
+  name: "Alice"
+};
+```
+
+### Conversation Streaming
+```typescript
+// Watch agent-to-agent conversations in real-time
+const event: ConversationStreamEvent = {
+  type: "conversation",
+  data: {
+    direction: "outgoing",
+    from: userAI,
+    to: weatherAgent,
+    message: snapMessage,
+    latency: 120,
+    cost: 0.01
+  }
+};
+```
+
+### Vector Search Optimized Agent Cards
+```typescript
+const agentCard: AgentCard = {
+  name: "Email Pro",
+  description: "Send emails, read emails, search emails, Gmail Outlook Yahoo",
+  keywords: ["email", "gmail", "outlook", "messaging"],
+  capabilities: ["email.send", "email.read", "email.search"],
+  requiresAccountLink: true,
+  rateLimit: { requests: 100, window: 60 }
+};
 ```
 
 ## 🛠️ Reference Implementations
@@ -66,11 +124,11 @@ snap-protocol-core/
 
 Full-featured implementation with:
 - Complete type safety with TypeScript
+- User & Agent identity support
+- Conversation streaming
 - Zod schema validation
 - Ed25519 cryptography via tweetnacl
 - Browser and Node.js support
-
-[→ TypeScript Documentation](./reference/typescript/README.md)
 
 ### Python *(Coming Soon)*
 
@@ -79,25 +137,9 @@ Python implementation with:
 - Cryptography library integration
 - AsyncIO support for streaming
 
-## 📖 Protocol Specification
-
-The SNAP protocol is defined in human-readable markdown documents:
-
-- **[Core Protocol](./specification/core/)** - Message format, identity, transport
-- **[Extensions](./specification/extensions/)** - Tasks, streaming, payments
-
-## 🎮 Try It Now
-
-Want to experiment with SNAP? Try our interactive playground:
-
-**[→ SNAP Protocol Playground](https://github.com/snap-protocol/playground)**
-
-Build messages, simulate tasks, and export code examples in your browser.
-
 ## 💡 Examples
 
 ### Multi-Modal Message
-
 ```typescript
 const message = createMessage(sender)
   .to(recipient)
@@ -114,25 +156,24 @@ const message = createMessage(sender)
   .build();
 ```
 
-### Task Management
-
+### Conversation Streaming
 ```typescript
-// Create a task
-const taskRequest = TaskManager.create(message)
-  .priority('high')
-  .timeout(300)
-  .callback('https://your-app.com/webhooks/task-status')
-  .build();
+// Subscribe to conversations
+const subscription = {
+  userId: "snap:user:alice-123",
+  streamTypes: ["conversations", "status"],
+  filter: {
+    agents: ["snap:agent:flight-booking"]
+  }
+};
 
-// Track progress
-const task = TaskManager.createTask(taskRequest, agent);
-task = TaskManager.startProcessing(task, 'Initializing...');
-task = TaskManager.updateProgress(task, 0.5, 'Processing data...');
-task = TaskManager.complete(task, resultMessage);
+// Receive real-time updates
+stream.on('conversation', (event) => {
+  console.log(`${event.data.from.id} → ${event.data.to.id}: Cost ${event.data.cost}`);
+});
 ```
 
 ### Payment Integration
-
 ```typescript
 const paymentMessage = MessageUtils.paymentRequest(
   serviceProvider,
@@ -140,18 +181,16 @@ const paymentMessage = MessageUtils.paymentRequest(
   50, // 50 SEMNET tokens
   'Premium analysis service'
 );
-
-// Process payment flow...
 ```
 
 ## 🔧 Development
 
 ```bash
 # Clone the repository
-git clone https://github.com/snap-protocol/core
+git clone https://github.com/SudharS172/SNAP.git
 
 # Install dependencies
-cd reference/typescript
+cd SNAP/reference/typescript
 npm install
 
 # Build
@@ -163,10 +202,6 @@ npm test
 # Start development mode
 npm run dev
 ```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Workflow
 
@@ -181,33 +216,29 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 - [x] Core protocol specification
 - [x] TypeScript reference implementation
+- [x] User identity system
+- [x] Conversation streaming
+- [x] Account linking protocol
 - [x] Multi-modal message support
 - [x] Task system with progress tracking
-- [x] Interactive playground
 - [ ] Python reference implementation
 - [ ] Go reference implementation
 - [ ] WebSocket transport layer
-- [ ] Advanced streaming features
-- [ ] Plugin system for extensions
+- [ ] End-to-end encryption option
 
-## 🆘 Support
+## 🤝 Contributing
 
-- **Documentation**: [https://docs.snapprotocol.org](https://docs.snapprotocol.org)
-- **Issues**: [GitHub Issues](https://github.com/snap-protocol/core/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/snap-protocol/core/discussions)
-- **Community**: [Discord](https://discord.gg/snapprotocol)
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+## 🔗 Links
 
-SNAP Protocol is inspired by:
-- **JSON-RPC 2.0** for transport standardization
-- **ActivityPub** for decentralized communication patterns  
-- **OpenAI API** for AI-first design principles
-- **WebRTC** for peer-to-peer communication concepts
+- **NPM Package**: [@semnet/snap-protocol](https://www.npmjs.com/package/@semnet/snap-protocol)
+- **Documentation**: [protocol.semnet.dev](https://protocol.semnet.dev)
+- **SEMNET Platform**: [semnet.dev](https://semnet.dev)
 
 ---
 

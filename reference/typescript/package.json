@@ -1,7 +1,7 @@
 {
-  "name": "@snap-protocol/core",
-  "version": "1.0.0",
-  "description": "TypeScript reference implementation of the SNAP Protocol",
+  "name": "@semnet/snap-protocol",
+  "version": "1.1.0",
+  "description": "TypeScript reference implementation of the SNAP Protocol v1.1 - Agent Internet Edition",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +32,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/snap-protocol/typescript"
+    "url": "https://github.com/SudharS172/SNAP"
+  },
+  "homepage": "https://github.com/SudharS172/SNAP#readme",
+  "bugs": {
+    "url": "https://github.com/SudharS172/SNAP/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "zod": "^3.23.8",
