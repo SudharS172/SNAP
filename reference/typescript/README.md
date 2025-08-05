@@ -3,7 +3,7 @@
 TypeScript implementation of SNAP (Semantic Network Agent Protocol) v1.1 - The foundation for the Agent Internet.
 
 [![npm version](https://badge.fury.io/js/semnet-snap-protocol.svg)](https://www.npmjs.com/package/semnet-snap-protocol)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Installation
 
@@ -253,4 +253,4 @@ See the [examples directory](../../examples/) for:
 
 ## License
 
-MIT License - Part of the SEMNET Agent Internet Project
+Apache 2.0 License - Part of the SEMNET Agent Internet Project

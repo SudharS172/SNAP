@@ -3,7 +3,7 @@
 The **Semantic Network Agent Protocol (SNAP)** is an open-source communication standard for AI agents. This repository contains the core protocol specification and reference implementations.
 
 [![npm version](https://badge.fury.io/js/semnet-snap-protocol.svg)](https://www.npmjs.com/package/semnet-snap-protocol)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## 🎯 What is SNAP?
 
@@ -231,7 +231,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+Apache 2.0 License - see [LICENSE](LICENSE) for details.
 
 ## 🔗 Links
 

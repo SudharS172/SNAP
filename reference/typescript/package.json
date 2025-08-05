@@ -1,6 +1,6 @@
 {
   "name": "semnet-snap-protocol",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "TypeScript reference implementation of the SNAP Protocol v1.1 - Agent Internet Edition",
   "type": "module",
   "main": "dist/index.js",
@@ -29,7 +29,7 @@
     "multi-modal"
   ],
   "author": "SNAP Protocol Contributors",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/SudharS172/SNAP"
