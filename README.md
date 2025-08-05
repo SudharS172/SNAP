@@ -2,7 +2,7 @@
 
 The **Semantic Network Agent Protocol (SNAP)** is an open-source communication standard for AI agents. This repository contains the core protocol specification and reference implementations.
 
-[![npm version](https://badge.fury.io/js/%40semnet%2Fsnap-protocol.svg)](https://www.npmjs.com/package/@semnet/snap-protocol)
+[![npm version](https://badge.fury.io/js/semnet-snap-protocol.svg)](https://www.npmjs.com/package/semnet-snap-protocol)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🎯 What is SNAP?
@@ -26,13 +26,13 @@ SNAP enables AI agents to communicate with rich, multi-modal messages while main
 ### Installation
 
 ```bash
-npm install @semnet/snap-protocol
+npm install semnet-snap-protocol
 ```
 
 ### Basic Usage
 
 ```typescript
-import { AgentIdentity, createMessage, UserID } from '@semnet/snap-protocol';
+import { AgentIdentity, createMessage, UserID } from 'semnet-snap-protocol';
 
 // Generate agent identity
 const agent = AgentIdentity.generate();
@@ -235,7 +235,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🔗 Links
 
-- **NPM Package**: [@semnet/snap-protocol](https://www.npmjs.com/package/@semnet/snap-protocol)
+- **NPM Package**: [semnet-snap-protocol](https://www.npmjs.com/package/semnet-snap-protocol)
 - **Documentation**: [protocol.semnet.dev](https://protocol.semnet.dev)
 - **SEMNET Platform**: [semnet.dev](https://semnet.dev)
 
