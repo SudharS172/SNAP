@@ -117,7 +117,6 @@ const agentCard: AgentCard = {
   rateLimit: { requests: 100, window: 60 }
 };
 ```
-
 ## 🛠️ Reference Implementations
 
 ### TypeScript/JavaScript
