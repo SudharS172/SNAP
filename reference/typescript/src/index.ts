@@ -1,6 +1,6 @@
 /**
  * @fileoverview SNAP Protocol TypeScript Reference Implementation
- * @version 1.0.0
+ * @version 1.1.2
  * @license MIT
  */
 
@@ -41,7 +41,7 @@ export {
 // MessageBuilder, MessageUtils, createMessage are already exported above from identity.js
 
 // Version constant
-export const SNAP_VERSION = '1.0' as const;
+export const SNAP_VERSION = '1.1' as const;
 
 // Protocol constants
 export const PROTOCOL_PREFIX = 'snap:agent:' as const;
@@ -52,7 +52,7 @@ export const PROTOCOL_PREFIX = 'snap:agent:' as const;
 export function isSNAPMessage(obj: any): boolean {
   return obj && 
          typeof obj.id === 'string' &&
-         obj.version === '1.0' &&
+         (obj.version === '1.0' || obj.version === '1.1') &&
          obj.from &&
          obj.timestamp &&
          Array.isArray(obj.parts) &&

@@ -1,4 +1,4 @@
-# SNAP Protocol v1.0 - Overview
+# SNAP Protocol v1.1.2 - Overview
 
 ## Introduction
 
@@ -163,7 +163,7 @@ The protocol is designed to be extensible through:
 
 ## Version History
 
-- **v1.0** (2025-01-01) - Initial specification
+- **v1.1.2** (2025-08-08) - Current specification
   - Core message format
   - Agent identity system
   - Basic discovery mechanism

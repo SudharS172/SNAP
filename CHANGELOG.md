@@ -1,6 +1,6 @@
 # SNAP Protocol Changelog
 
-## Version 1.1.0 - Agent Internet Edition (2025-01-15)
+## Version 1.1.2 - Agent Internet Edition (2025-08-08)
 
 ### Major Features
 

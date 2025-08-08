@@ -22,7 +22,7 @@ export class MessageBuilder {
   constructor(from: AgentID) {
     this.message = {
       id: generateMessageId(),
-      version: '1.0',
+      version: '1.1',
       from,
       timestamp: new Date().toISOString(),
       parts: []

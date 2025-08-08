@@ -1,4 +1,4 @@
-# SNAP Protocol v1.0 - Message Format
+# SNAP Protocol v1.1.2 - Message Format
 
 ## Core Message Structure
 
@@ -7,7 +7,7 @@ All SNAP messages are transported using JSON-RPC 2.0 and follow this structure:
 ```typescript
 interface SNAPMessage {
   id: string;           // Unique message identifier
-  version: "1.0";       // Protocol version
+  version: "1.1";       // Protocol version
   from: AgentID;        // Sender identity
   to?: AgentID;         // Optional recipient (for routing)
   timestamp: string;    // ISO 8601 timestamp
@@ -168,7 +168,7 @@ SNAP messages are transported using JSON-RPC 2.0:
   "params": {
     "message": {
       "id": "msg_12345",
-      "version": "1.0",
+      "version": "1.1",
       "from": {
         "id": "snap:agent:sender-uuid"
       },
@@ -192,7 +192,7 @@ SNAP messages are transported using JSON-RPC 2.0:
   "result": {
     "message": {
       "id": "msg_54321",
-      "version": "1.0",
+      "version": "1.1",
       "from": {
         "id": "snap:agent:receiver-uuid"
       },
@@ -257,7 +257,7 @@ enum SNAPErrorCode {
 
 ### Required Fields
 - `id` - Must be unique per sender
-- `version` - Must be "1.0"
+- `version` - Must be "1.1"
 - `from` - Valid agent ID
 - `timestamp` - Valid ISO 8601 timestamp
 - `parts` - Non-empty array of valid parts
@@ -315,7 +315,7 @@ For content exceeding size limits:
 ```json
 {
   "id": "msg_001",
-  "version": "1.0",
+  "version": "1.1",
   "from": {"id": "snap:agent:chatbot"},
   "timestamp": "2025-01-01T12:00:00Z",
   "parts": [
@@ -331,7 +331,7 @@ For content exceeding size limits:
 ```json
 {
   "id": "msg_002",
-  "version": "1.0",
+  "version": "1.1",
   "from": {"id": "snap:agent:designer"},
   "timestamp": "2025-01-01T12:00:00Z",
   "parts": [
@@ -355,7 +355,7 @@ For content exceeding size limits:
 ```json
 {
   "id": "msg_003",
-  "version": "1.0",
+  "version": "1.1",
   "from": {"id": "snap:agent:translator"},
   "timestamp": "2025-01-01T12:00:00Z",
   "parts": [

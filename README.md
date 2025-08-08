@@ -1,4 +1,4 @@
-# SNAP Protocol v1.1 - Agent Internet Edition
+# SNAP Protocol v1.1.2 - Agent Internet Edition
 
 The **Semantic Network Agent Protocol (SNAP)** is an open-source communication standard for AI agents. This repository contains the core protocol specification and reference implementations.
 
@@ -79,7 +79,7 @@ SNAP/
 └── schemas/              # JSON Schema definitions
 ```
 
-## 🆕 What's New in v1.1
+## 🆕 What's New in v1.1.2
 
 ### User Identity System
 ```typescript
