@@ -236,8 +236,8 @@ Apache 2.0 License - see [LICENSE](LICENSE) for details.
 ## 🔗 Links
 
 - **NPM Package**: [semnet-snap-protocol](https://www.npmjs.com/package/semnet-snap-protocol)
-- **Documentation**: [protocol.semnet.dev](https://protocol.semnet.dev)
-- **SEMNET Platform**: [semnet.dev](https://semnet.dev)
+- **Documentation**: [protocol.semnet.dev](https://semantic-net.com/)
+- **SEMNET Platform**: [semnet.dev](https://semantic-net.com/)
 
 ---
 
